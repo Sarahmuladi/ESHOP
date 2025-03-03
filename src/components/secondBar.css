@@ -1,0 +1,37 @@
+.secondBar{
+    display: flex;
+}
+
+.eShop{
+    font-weight: bolder;
+    padding-left: 100px;
+    padding-right: 600px;
+    font-size: 25px;
+}
+
+.searchContainer{
+    position: relative;
+}
+
+.searchBar{
+    padding: 10px 40px 10px 10px;
+    border: 1px solid;
+}
+
+.searchIcon{
+    position: absolute;
+    right: 10px;
+    top: 30%;
+}
+
+.cart{
+    padding-left: 20px;
+    padding-right: 20px;
+    display: flex;
+}
+
+.user{
+    padding-left: 20px;
+    padding-right: 20px;
+    display: flex;
+}

@@ -1,0 +1,46 @@
+.banner{
+    display: flex;
+    background-color: #f0efef;
+    margin-left: 100px;
+    margin-right: 136px;
+}
+
+.heading{
+    font-weight: bolder;
+    font-size: 30px;
+    padding: 80px 220px 5px 50px;
+}
+
+.message{
+    padding: 5px 0px 10px 50px;
+}
+
+.button{
+    margin: 15px 0px 10px 50px;
+    background-color: red;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.imageRapper{
+    position: relative;
+    display: inline-block;
+}
+
+img{
+    display: block;
+}
+
+.overlay{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #f0efef;
+    mix-blend-mode: multiply;
+    pointer-events: none;
+}

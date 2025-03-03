@@ -1,0 +1,10 @@
+.bannerBar{
+    display: flex;
+    margin: 20px 100px 20px 100px;
+}
+
+.element{
+    display: flex;
+    justify-content: space-between;
+    
+}

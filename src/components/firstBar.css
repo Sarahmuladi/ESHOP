@@ -1,0 +1,47 @@
+.firstBar{
+    display: flex;
+    height: 20px;
+}
+
+.Location{
+    display: flex;
+    justify-content: space-between;
+    padding-left: 100px;
+    padding-right: 5px;
+}
+
+.Contact{
+    display: flex;
+    justify-content: space-between;
+    padding-left: 15px;
+    padding-right: 400px;
+}
+
+.Currency{
+    border: none;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.Language{
+    padding-left: 15px;
+    padding-right: 15px;
+    display: flex;
+}
+
+.Icons{
+    padding-right: 100px;
+    display: flex;
+}
+
+.Icon{
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+@media screen and (max-width: 480px) {
+    .firstBar{
+        display: flex;
+    }
+    
+}

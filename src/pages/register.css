@@ -1,0 +1,38 @@
+.Loginbg{
+    background:linear-gradient(rgb(163, 1, 90), blue);
+    height: 100vh;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    }
+    
+    .loginForm{
+        z-index: 1;
+        margin: 8rem 16rem 0rem 16rem;
+        width: 20%;
+        height: 30rem;
+        background-color: white;
+        margin: 0px auto;
+        padding: 1rem 3rem;
+    }
+    
+    .heading{
+        padding: 0rem 8rem 0rem 4rem;
+    }
+    
+    .input{
+        width: 16rem;
+        height: 3rem;
+        margin-bottom: 2rem;
+    }
+    
+    .loginbtn{
+        width: 16rem;
+        height: 3rem;
+        margin-bottom: 1rem;
+        background-color: rgb(163, 1, 90);
+        border: none;
+        color: white;
+        font-weight: bold;
+    }

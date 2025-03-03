@@ -1,0 +1,8 @@
+.NavBar{
+    display: flex;
+    background-color: red;
+    color: white;
+    padding: 10px 100px 10px 100px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
