@@ -34,6 +34,11 @@ const getOrderItemsByOrderId = "SELECT * FROM order_items WHERE order_id = $1";
 const getOrderItemById = "SELECT * FROM order_items WHERE id = $1";
 const updateOrderItem = "UPDATE order_items SET quantity = $1, price = $2 WHERE id = $3";
 const deleteOrderItem = "DELETE FROM order_items WHERE id = $1";
+const checkEmailAlreadyInUse = "SELECT s FROM users s WHERE s.email = $1";
+const registerUser = "INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *";
+const userLogin = "SELECT * FROM users WHERE email = $1 ";
+const emailCheck = "SELECT * FROM users WHERE email = $1";
+const logout = "UPDATE users SET refresh_token = NULL WHERE refresh_token = $1";
 
 export default {
     getProducts,
@@ -68,5 +73,10 @@ export default {
     getOrderItemsByOrderId,
     getOrderItemById,
     updateOrderItem,
-    deleteOrderItem
+    deleteOrderItem,
+    checkEmailAlreadyInUse,
+    registerUser,
+    userLogin,
+    emailCheck,
+    logout
 };

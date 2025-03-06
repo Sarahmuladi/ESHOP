@@ -1,6 +1,9 @@
 .firstBar{
     display: flex;
-    height: 20px;
+    height: 35px;
+    align-items: center;
+    justify-content: center;
+    
 }
 
 .Location{

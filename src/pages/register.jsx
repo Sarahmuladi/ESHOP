@@ -1,42 +1,77 @@
-import React from 'react'
+import React, { useState } from 'react';
 import "./register.css";
+//import { register } from '../context/authContext';
+import { useNavigate } from 'react-router-dom';
 
+const Register = () => {
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [error, setError] = useState(null);
+    const [message, setMessage] = useState(null);
 
-const Register = () => { 
+    const navigate = useNavigate();
 
-  const handleClick = () =>{
-    alert("registered successfully")
-  }
+    const handleRegister = async (e) => {
+        e.preventDefault();
 
-  return (
-    <div className='Loginbg'>
-    <div className='loginForm'>
-      <div className='heading'><h4>REGISTER</h4></div>
+        if (password !== confirmPassword) {
+            setError("Passwords do not match");
+            return;
+        }
 
-      <div>
-      <input type='email' placeholder='Enter Email' className='input'/>
-      </div>
+        
+            const response = await fetch('http://localhost:6010/api/register', {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name, email, password }),
+            });
 
-      <div>
-      <input type='password' placeholder='Enter Password' className='input' style={{marginBottom: "0rem"}}/>
-      </div>
+            if (!response.ok) {
+                setError('Failed to register');
+            }
 
-      <div>
-      <input type='password' placeholder='Confirm Password' className='input' style={{margin: "2rem 0rem"}}/>
-      </div>
+            else {
+                setMessage("Registered Successful");
+                navigate('/login');
+            
 
-      <button type='button' onClick={handleClick} className='loginbtn'>SUBMIT</button>
+            const data = await response.json();
+            console.log(data);
+           
+        } 
+    };
 
-    
-      
-      
-
-        <p style={{padding: "0px 20px"}}>Already have an account? <a href='./login'>Sign in</a></p>
-
-      </div>
-    </div>
-    
-  )
-}
+    return (
+        <>
+            <form onSubmit = {handleRegister}>
+                <div className='Loginbg'>
+                    <div className='loginForm'>
+                        <div className='heading'><h4>REGISTER</h4></div>
+                        {error && <p style={{ color: 'red' }}>{error}</p>}
+                        {message && <p style={{ color: 'green' }}>{message}</p>}
+                        <div>
+                            <input type='text' placeholder='Enter Name' className='input' onChange={(e) => setName(e.target.value)} required />
+                        </div>
+                        <div>
+                            <input type='email' placeholder='Enter Email' className='input' onChange={(e) => setEmail(e.target.value)} required />
+                        </div>
+                        <div>
+                            <input type='password' placeholder='Enter Password' className='input' style={{ marginBottom: "0rem" }} onChange={(e) => setPassword(e.target.value)} required />
+                        </div>
+                        <div>
+                            <input type='password' placeholder='Confirm Password' className='input' style={{ margin: "2rem 0rem" }} onChange={(e) => setConfirmPassword(e.target.value)} required />
+                        </div>
+                        <button type='submit' className='loginbtn'>SUBMIT</button>
+                        <p style={{ padding: "0px 20px" }}>Already have an account? <a href='./login'>Sign in</a></p>
+                    </div>
+                </div>
+            </form>
+        </>
+    );
+};
 
 export default Register;

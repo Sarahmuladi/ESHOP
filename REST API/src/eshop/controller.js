@@ -1,5 +1,9 @@
 import pool from '../../db.js';
 import queries from './queries.js';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config();
 
 // GET ALL PRODUCTS FROM DATABASE
 const getProducts = (req, res) =>{
@@ -123,18 +127,18 @@ const updateUser = (req, res) => {
 
     // Validate required fields
     if (!name || !email ) {
-    return res.status(400).send("name and email are required.");
+    return res.status(400).json("name and email are required.");
     }
 
     //Check if the user exists in the database
       pool.query(queries.getUserById, [id], (error, results) => {
         if (error) {
-            return res.status(500).send("Error checking user in database.");
+            return res.status(500).json("Error checking user in database.");
         }
 
         const userNotFound = !results.rowCount;
         if (userNotFound) {
-            return res.status(404).send("User does not exist in the database.");
+            return res.status(404).json("User does not exist in the database.");
 }
       });    
 
@@ -142,16 +146,16 @@ const updateUser = (req, res) => {
     // Handle password update logic
     if (oldPassword && newPassword && confirmPassword) {
         if (newPassword !== confirmPassword) {
-        return res.status(400).send("Passwords do not match.");
+        return res.status(400).json("Passwords do not match.");
         }
 
         // Update user with new password
         pool.query(queries.updateUser, [name, email, newPassword, id], (error, results) => {
         if (error) {
-        return res.status(500).send("Error updating user.");
+        return res.status(500).json("Error updating user.");
         }
 
-        res.status(200).send("User updated successfully.");
+        res.status(200).json("User updated successfully.");
 
         });
     } 
@@ -160,10 +164,10 @@ const updateUser = (req, res) => {
         pool.query(queries.updateUser, [name, email, password, id], (error, results) => {
             
         if (error) {
-        return res.status(500).send("Error updating user.");
+        return res.status(500).json("Error updating user.");
         }
 
-        res.status(200).send("User updated successfully.");
+        res.status(200).json("User updated successfully.");
         });
     
 };
@@ -173,23 +177,23 @@ const addProductToWishlist = (req, res) => {
     const { product_id, user_id } = req.body;
 
     if (!product_id || !user_id) {
-        return res.status(400).send("Product ID and User ID are required.");
+        return res.status(400).json("Product ID and User ID are required.");
     }
 
     pool.query(queries.checkProductExistsInWishlist, [product_id, user_id], (error, results) => {
         if (error) {
-            return res.status(500).send("Error checking product in wishlist.");
+            return res.status(500).json("Error checking product in wishlist.");
         }
 
         if (results.rows.length) {
-            return res.status(400).send("Product already exists in the wishlist.");
+            return res.status(400).json("Product already exists in the wishlist.");
         }
 
         pool.query(queries.addProductToWishlist, [user_id, product_id], (error, results) => {
             if (error) {
-                return res.status(500).send("Error adding product to wishlist.");
+                return res.status(500).json("Error adding product to wishlist.");
             }
-            res.status(201).send("Product added to wishlist successfully.");
+            res.status(201).json("Product added to wishlist successfully.");
         });
     });
 };
@@ -492,6 +496,107 @@ const deleteOrderItem = (req, res) => {
     });
 };
 
+//REGISTERING A USER
+    const registerUser = async (req, res) => {
+    const { name, email, password } = req.body;
+
+
+    try {
+       //check if the email is already in use
+        const emailCheck = await pool.query(queries.emailCheck, [email]);
+            
+        if (emailCheck.rows.length > 0) {
+            return res.status(400).json("Email already in use" );
+        }
+
+
+        //Hash the password
+        const saltRounds = 10;
+        const hashedPassword = bcrypt.hashSync(password, saltRounds);
+
+        const newUser = await pool.query(
+            queries.registerUser,
+            [name, email, hashedPassword]
+        );
+
+        res.status(201).json(newUser.rows[0]);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json("Server error" );
+    }
+};
+
+
+
+//LOGIN AS A REGISTERED USER
+const userLogin =  (req, res) => {
+    const { email, password } = req.body;
+
+    //validate the fields
+   try{ if (!email || !password) {
+        return res.status(400).json("Email and password are required.");
+    }
+
+    pool.query(queries.userLogin, [email], (error, results) => {
+        if (error) {
+            return res.status(500).json("Error logging in.");
+        }
+
+        if (results.rows.length === 0) {
+            return res.status(400).json({error: "User not found"});
+        }
+
+        const user = results.rows[0];
+
+        //compare the password
+        const validPassword = bcrypt.compareSync(password, user.password);
+
+        if (!validPassword) {
+            return res.status(401).json({error: "Invalid password"});
+        }
+
+        res.status(200).json(user);
+
+    }); 
+
+
+        // Generate JWT tokens
+        const userPayload = { id: user.rows[0].id, email: user.rows[0].email };
+
+        const accessToken = jwt.sign(userPayload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRY });
+        const refreshToken = jwt.sign(userPayload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: process.env.REFRESH_TOKEN_EXPIRY });
+
+        res.status(200).json({ message: "Login successful", accessToken, refreshToken });
+
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+  
+};
+
+
+
+// Logout
+const logout = async (req, res) => {
+   const { refreshToken } = req.body;
+
+    pool.query(queries.logout, [refreshToken], (error, results) => {
+    if (error) {
+        return res.status(500).json({ message: error.message });
+    }
+    res.json({ message: "Logged out successfully" });
+   });
+
+};
+
+
+
+
+
+
+
+
+
 export  {
     getProducts,
     getProductById,
@@ -517,5 +622,8 @@ export  {
     getOrderItemsByOrderId,
     getOrderItemById,
     updateOrderItem,
-    deleteOrderItem
+    deleteOrderItem,
+    userLogin,
+    registerUser,
+    logout
 };

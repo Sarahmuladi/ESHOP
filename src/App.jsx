@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import './App.css';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 import Home from "./pages/home";
-import Login from "./pages/login";
 import Register from "./pages/register";
+import Test from './pages/test';
+import Login from './pages/login';
+//import { AuthProvider } from './context/authContext';
+import { ProtectedRoute } from './pages/protectedRoute';
 
 
 function App() {
@@ -11,13 +14,15 @@ function App() {
 
   return (
     <>
-    <BrowserRouter>
-    <Routes>
-      <Route path='/' element = {<Home/>}/>
-      <Route path='login' element = {<Login/>}/>
-      <Route path='register' element = {<Register/>}/>
-    </Routes>
-    </BrowserRouter>
+    
+    <Router>
+      <Routes>
+      <Route path='/' element = {<ProtectedRoute><Home/></ProtectedRoute>}/>
+      <Route path='/login' element = {<Login/>}/>
+      <Route path='/register' element = {<Register/>}/>
+      </Routes>
+    </Router>
+    
     </>
   )
 }

@@ -11,7 +11,7 @@ export const SecondBar = () => {
 
         <div className='searchContainer'>
         <input type='search' name='searchBar' placeholder='Search Products' className='searchBar'/>
-        <IoIosSearch className='searchIcon'/>
+        <IoIosSearch className='searchIcon' style={{color: "black"}}/>
         </div>
 
         <div className='cart'>

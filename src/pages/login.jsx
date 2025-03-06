@@ -1,28 +1,63 @@
 import React from 'react'
+import { useContext, useState } from 'react';
+//import { AuthContext } from '../context/authContext';
 import "./login.css";
 import { FaFacebookSquare } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
 import { useNavigate } from 'react-router-dom';
+//import { login } from '../context/authContext';
 
 const Login = () => { 
 
 const navigate = useNavigate();
 
-const handleClick = () => {
-  navigate("/")
+const [email, setEmail] = useState("");
+const [password, setPassword] = useState("");
+//const { login, error, loading } = useContext(AuthContext);
+const [message, setMessage] = useState(null);
+
+const handleSubmit = async(e) => {
+  e.preventDefault();
+
+ 
+
+  const response = await fetch('http://localhost:6010/api/login', {
+    method: "POST",
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email, password }),
+});
+
+
+
+if (response.ok) {
+    localStorage.setItem("user", JSON.stringify({ email, password }));
+    navigate('/');
+    
+}
+else {
+    //setMessage("Invalid email or password");
+    //console.log(message);
+    alert("Invalid email or password");
+    navigate('/login');
+}
 };
 
   return (
+    <>
+    <form onSubmit={handleSubmit}>
     <div className='Loginbg'>
     <div className='loginForm'>
       <div className='heading'><h4>LOGIN</h4></div>
 
       <div>
-      <input type='email' placeholder='  Email' className='input'/>
+      <input type='email' placeholder='  Email' className='input' onChange={(e) => setEmail(e.target.value)}/>
       </div>
 
       <div>
-      <input type='password' placeholder='Password' className='input' style={{marginBottom: "0rem"}}/>
+      <input type='password' placeholder='Password' className='input' style={{marginBottom: "0rem"}}
+      onChange={(e) => setPassword(e.target.value)}/>
       </div>
 
       <div className='rememberMe'>
@@ -30,7 +65,7 @@ const handleClick = () => {
         <p>Remember Me</p>
       </div>
 
-      <button type='button' className='loginbtn' onClick={handleClick}>LOGIN</button>
+      <button type='submit' className='loginbtn'>LOGIN</button>
 
      <div style={{padding: "0px 80px"}}><p>Or login with</p></div>
       
@@ -54,7 +89,11 @@ const handleClick = () => {
       </div>
     </div>
     </div>
-  )
+  
+</form>
+</>
+
+  );
 }
 
 export default Login;

@@ -1,5 +1,11 @@
 .secondBar{
     display: flex;
+    color: #333;
+    background-color: red;
+   height: 80px;
+   align-items: center;
+   justify-content: center;
+   margin-bottom: 20px;
 }
 
 .eShop{
@@ -11,11 +17,13 @@
 
 .searchContainer{
     position: relative;
+   
 }
 
 .searchBar{
     padding: 10px 40px 10px 10px;
     border: 1px solid;
+    border-radius: 20px;
 }
 
 .searchIcon{

@@ -1,7 +1,7 @@
 import React from 'react'
 import { FirstBar } from '../components/firstBar';
 import { SecondBar } from '../components/secondBar';
-import { NavBar } from '../components/navBar';
+//import { NavBar } from '../components/navBar';
 import { Banner } from '../components/banner';
 import { BannerBar } from '../components/bannerBar';
 import { Products } from '../components/products';
@@ -11,11 +11,10 @@ const Home = () => {
     <>
     <div className='body' style={{border: "1px solid #ccc", zIndex: "2"}}>
     <FirstBar/>
-    <hr/>
 
     <SecondBar/>
 
-    <NavBar/>
+    {/*<NavBar/>*/}
 
     <Banner/>
 

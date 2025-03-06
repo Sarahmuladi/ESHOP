@@ -1,4 +1,4 @@
-import React from 'react';
+/*import React from 'react';
 import { BsList } from 'react-icons/bs';
 import "./navBar.css";
 
@@ -16,3 +16,4 @@ export const NavBar = () => {
     </nav>
   )
 }
+*/
