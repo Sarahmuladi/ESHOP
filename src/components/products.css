@@ -1,19 +1,15 @@
 .products{
-   margin: 80px auto;
+   margin: 20px auto;
    padding: 0px 80px; 
   position: relative;
    
 }
 
 image{
-    width: 50%;
-    padding: 0px 20px;
-    margin: 0px 20px;}
-    /*display: inline-block;
-    padding: 10px 20px;
-    background-color: white;
-    cursor: pointer;
-}*/
+    width: 25%;
+    padding: 0px 5px;
+    margin: 0px 5px;
+}
 
 .image :hover{
     border: 1px solid #ccc;
@@ -32,7 +28,7 @@ image{
     right: 0;
     transform: translateY(-50%);
     padding: 10px;
-    width: 20px;
+    width: 50px;
     border-radius: 50%;
     cursor: pointer;
     border: 1px solid black;
@@ -49,7 +45,7 @@ image{
 
 .slider ul{
     display: flex;
-    width: 200%;
+    width: 100%;
     overflow-x: hidden;
     transition: 0.5s;
 }

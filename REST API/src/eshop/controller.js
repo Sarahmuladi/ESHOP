@@ -5,12 +5,27 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 dotenv.config();
 
-// GET ALL PRODUCTS FROM DATABASE
-const getProducts = (req, res) =>{
-    pool.query(queries.getProducts, (error, results) => {
-        if (error) throw error;
-        res.status(200).json(results.rows)
-    });
+
+// GET /products?page=1&limit=4
+const getProducts =  async (req, res) => {
+    const page = parseInt(req.query.page) || 1;  // Default to page 1
+    const limit = parseInt(req.query.limit) || 4; // Default limit 4
+    const offset = (page - 1) * limit;
+
+    try {
+        const products = await pool.query(queries.getProducts , [limit, offset]);
+
+        const total = await pool.query("SELECT COUNT(*) FROM products");
+
+        res.json({
+            products: products.rows,
+            total: parseInt(total.rows[0].count),
+            page,
+            totalPages: Math.ceil(total.rows[0].count / limit),
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 };
 
 // GET A SINGLE PRODUCT FROM DATABASE BY ID 
@@ -497,22 +512,20 @@ const deleteOrderItem = (req, res) => {
 };
 
 //REGISTERING A USER
-    const registerUser = async (req, res) => {
+const registerUser = async (req, res) => {
     const { name, email, password } = req.body;
 
-
     try {
-       //check if the email is already in use
+        //check if the email is already in use
         const emailCheck = await pool.query(queries.emailCheck, [email]);
             
         if (emailCheck.rows.length > 0) {
-            return res.status(400).json("Email already in use" );
+            return res.status(400).json({ error: "Email already in use" });
         }
-
 
         //Hash the password
         const saltRounds = 10;
-        const hashedPassword = bcrypt.hashSync(password, saltRounds);
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
 
         const newUser = await pool.query(
             queries.registerUser,
@@ -522,82 +535,106 @@ const deleteOrderItem = (req, res) => {
         res.status(201).json(newUser.rows[0]);
     } catch (err) {
         console.error(err.message);
-        res.status(500).json("Server error" );
+        res.status(500).json({ error: "Server error" });
     }
 };
 
-
-
 //LOGIN AS A REGISTERED USER
-const userLogin =  (req, res) => {
+const userLogin = async (req, res) => {
     const { email, password } = req.body;
 
     //validate the fields
-   try{ if (!email || !password) {
-        return res.status(400).json("Email and password are required.");
-    }
-
-    pool.query(queries.userLogin, [email], (error, results) => {
-        if (error) {
-            return res.status(500).json("Error logging in.");
+    try {
+        if (!email || !password) {
+            return res.status(400).json({ error: "Email and password are required." });
         }
 
+        const results = await pool.query(queries.userLogin, [email]);
+        
         if (results.rows.length === 0) {
-            return res.status(400).json({error: "User not found"});
+            return res.status(400).json({ error: "User not found" });
         }
 
         const user = results.rows[0];
 
         //compare the password
-        const validPassword = bcrypt.compareSync(password, user.password);
+        const validPassword = await bcrypt.compare(password, user.password);
 
         if (!validPassword) {
-            return res.status(401).json({error: "Invalid password"});
+            return res.status(401).json({ error: "Invalid password" });
         }
-
-        res.status(200).json(user);
-
-    }); 
-
-
+ 
         // Generate JWT tokens
-        const userPayload = { id: user.rows[0].id, email: user.rows[0].email };
+        const jwtSecret = process.env.JWT_SECRET;
+        
+        if (!jwtSecret) {
+            console.error("JWT_SECRET is not defined in environment variables");
+            return res.status(500).json({ error: "Server configuration error" });
+        }
+        
+        const userPayload = { 
+            id: user.id,
+            email: user.email,
+            name: user.name
+        };
 
         const accessToken = jwt.sign(userPayload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRY });
         const refreshToken = jwt.sign(userPayload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: process.env.REFRESH_TOKEN_EXPIRY });
-
-        res.status(200).json({ message: "Login successful", accessToken, refreshToken });
-
+        
+        //sending one response with all the data
+        res.status(200).json({ 
+            message: "Login successful",
+            user: userPayload, 
+            accessToken, 
+            refreshToken 
+        });
     } catch (error) {
+        console.error("Login error:", error);
         res.status(500).json({ error: error.message });
     }
-  
 };
 
+// Refresh Access Token
+const refreshAccessToken = async (req, res) => {
+    const { refreshToken } = req.body;
 
+    if (!refreshToken) {
+        return res.status(401).json({ error: "Refresh token is required" });
+    }
+
+    try {
+        const userPayload = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+        const newAccessToken = jwt.sign(
+            { id: userPayload.id, email: userPayload.email, name: userPayload.name }, 
+            process.env.ACCESS_TOKEN_SECRET, 
+            { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
+        );
+
+        res.status(200).json({ accessToken: newAccessToken });
+    } catch (error) {
+        res.status(403).json({ error: "Invalid refresh token" });
+    }
+};
 
 // Logout
 const logout = async (req, res) => {
-   const { refreshToken } = req.body;
+    const { refreshToken } = req.body;
 
-    pool.query(queries.logout, [refreshToken], (error, results) => {
-    if (error) {
-        return res.status(500).json({ message: error.message });
+    if (!refreshToken) {
+        return res.status(400).json({ error: "Refresh token is required" });
     }
-    res.json({ message: "Logged out successfully" });
-   });
 
+    try {
+        await pool.query(queries.logout, [refreshToken]);
+        res.status(200).json({ message: "Logged out successfully" });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 };
 
 
 
-
-
-
-
-
-
-export  {
+export {
     getProducts,
     getProductById,
     addUser,
@@ -625,5 +662,6 @@ export  {
     deleteOrderItem,
     userLogin,
     registerUser,
-    logout
+    logout,
+    refreshAccessToken
 };

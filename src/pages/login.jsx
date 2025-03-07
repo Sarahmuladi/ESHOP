@@ -1,55 +1,56 @@
 import React from 'react'
-import { useContext, useState } from 'react';
-//import { AuthContext } from '../context/authContext';
+import { useState } from 'react';
 import "./login.css";
 import { FaFacebookSquare } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
 import { useNavigate } from 'react-router-dom';
-//import { login } from '../context/authContext';
+import { AuthContext } from '../context/authContext';
+import { useContext} from 'react'
+
+
 
 const Login = () => { 
 
-const navigate = useNavigate();
+    const navigate = useNavigate();
 
-const [email, setEmail] = useState("");
-const [password, setPassword] = useState("");
-//const { login, error, loading } = useContext(AuthContext);
-const [message, setMessage] = useState(null);
-
-const handleSubmit = async(e) => {
-  e.preventDefault();
-
- 
-
-  const response = await fetch('http://localhost:6010/api/login', {
-    method: "POST",
-    headers: {
-        'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email, password }),
-});
-
-
-
-if (response.ok) {
-    localStorage.setItem("user", JSON.stringify({ email, password }));
-    navigate('/');
+    const { login} = useContext(AuthContext);
+    const { setUser } = useContext(AuthContext);
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [message, setMessage] = useState(null);
     
-}
-else {
-    //setMessage("Invalid email or password");
-    //console.log(message);
-    alert("Invalid email or password");
-    navigate('/login');
-}
-};
 
-  return (
+    const handleSubmit = async(e) => {
+    e.preventDefault();
+
+     const response = await fetch("http://localhost:5000/api/login", {
+          method: "POST",
+          body: JSON.stringify({ email, password }),
+          headers: { "Content-Type": "application/json" },
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+          localStorage.setItem("accessToken", data.accessToken);
+          localStorage.setItem("refreshToken", data.refreshToken);
+          setUser(data.user); // Update context
+          navigate("/"); 
+      } else {
+          console.error("Login failed:", data.error);
+      }
+
+    }
+
+
+return (
     <>
-    <form onSubmit={handleSubmit}>
+    <form onSubmit = {handleSubmit}>
     <div className='Loginbg'>
     <div className='loginForm'>
+
       <div className='heading'><h4>LOGIN</h4></div>
+      {message && <p style={{ color: 'red' }}>{message}</p>}
 
       <div>
       <input type='email' placeholder='  Email' className='input' onChange={(e) => setEmail(e.target.value)}/>

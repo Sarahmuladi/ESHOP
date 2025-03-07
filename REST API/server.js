@@ -4,18 +4,21 @@ import productsRoutes from './src/products/routes.js';
 import registerRoutes from './src/register/routes.js';
 import loginRoutes from './src/login/routes.js';
 import cors from 'cors';
+import dotenv from 'dotenv';
+dotenv.config();
 
 
 
 const app = express();
-const port = 6010;
+const port = process.env.PORT || 5000
 
 app.use(express.json());
 app.use(cors());
 
-const secret_key = "my_key";
+
 
 app.get("/", (req, res) =>{
+    console.log(`${process.env.PORT}`);
     res.send("Hello World")
 });
 

@@ -1,149 +1,84 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import "./products.css";
 import { MdNavigateNext } from 'react-icons/md';
 import { MdNavigateBefore } from 'react-icons/md';
-import { useRef } from 'react';
+import axios from 'axios';
+
 
 export const Products = () => {
+    const [products, setProducts] = useState([]);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
 
-    const slider = useRef();
-    let tx = 0;
+    const fetchProducts = async (pageNumber) => {
+        try {
+            const res = await axios.get(`http://localhost:5000/api/products`, {
+                params: { page: pageNumber, limit: 4 }
+            });
 
-    const slideForward = () =>{
-      if(tx > -50){
-        tx -= 25;
-      }
-      slider.current.style.transform = 'translateX(${tx}%)'
-    }
+            setProducts(res.data.products);
+            setTotalPages(res.data.totalPages);
+        } catch (error) {
+            console.error("Error fetching products", error);
+        }
+    };
 
-    const slideBackward = () =>{
-        if(tx < 0){
-            tx += 25;
-          }
-          slider.current.style.transform = 'translateX(${tx}%)'
-    }
+    useEffect(() => {
+        fetchProducts(page);
+    }, [page]);
 
-  return (
-    <div className='products'>
-        <div className = 'backbtn'>
-            < MdNavigateBefore size={25} onClick={slideBackward}/></div>
+    return (
+        <>
 
-        <div className='nextbtn'>
-            <MdNavigateNext size={25} onClick = {slideForward}/></div> 
+        <div style={{padding: "20px 0px 5px 100px"}}><h3>Featured Products</h3></div>
 
-            <div className='slider'>
-        <ul ref={slider}>
-            <li>
-        <div className='image'>
-            <img src='./Images/img2.PNG' style={{height: "250px", width: "200px"}}/>
-            <p>PHONE</p>
-            <p><b>JPhone 13 High quality <br/> Value Buy Best Camera</b></p>
-            <p><b>$999.00</b></p>
-        </div>
-             </li>
-
-          <li>
-        <div className='image'>
-        <img src='./Images/img7.PNG' style={{height: "250px", width: "200px"}}/>
-        <div>AUDIO</div>
-            <p><b>WH-1000XM4 Wireless <br/> Headphones High Quality</b></p>
-            <p><b style={{color: "red"}}>$59.00</b><span style={{textDecoration: "line-through"}}>  $110</span></p>
-        </div>
-        </li>
-
-         <li>
-        <div className='image'>
-        <img src='./Images/img6.PNG' style={{height: "250px", width: "250px"}}/>
-        <div>LAPTOP</div>
-            <p><b>S21 Laptop Ultra HD LED <br/> 
-            Screen Feature 2023...</b></p>
-            <p><b>$1,199.00</b></p>
-        </div>
-        </li>
-
-         <li>
-        <div className='image'>
-        <img src='./Images/img3.PNG' style={{height: "250px", width: "200px"}}/>
-        <div>CAMERA</div>
-            <p><b>Mini Polaroid Camera <br/> for Girls with Flash Light</b></p>
-            <p><b>$79.00</b></p>
-        </div>
-        </li>
-
-        <li>
-        <div className='image'>
-        <img src='./Images/img5.PNG' style={{height: "250px", width: "250px"}}/>
-        <div>TELEVISION</div>
-            <p><b>AG OLED65CXPUA 4K <br/> Smart OLED TV New</b></p>
-            <p><b>$2,799.00</b></p>
-        </div>
-        </li>
-
-        <li>
-        <div className='image'>
-        <img src='./Images/img6.PNG' style={{height: "250px", width: "250px"}}/>
-        <div>LAPTOP</div>
-            <p><b>S21 Laptop Ultra HD LED <br/> 
-            Screen Feature 2023...</b></p>
-            <p><b>$1,199.00</b></p>
-        </div>
-        </li>
-
-        <li>
-        <div className='image'>
-        <img src='./Images/img6.PNG' style={{height: "250px", width: "250px"}}/>
-        <div>LAPTOP</div>
-            <p><b>S21 Laptop Ultra HD LED <br/> 
-            Screen Feature 2023...</b></p>
-            <p><b>$1,199.00</b></p>
-        </div>
-        </li>
-
-        <li>
-        <div className='image'>
-        <img src='./Images/img6.PNG' style={{height: "250px", width: "250px"}}/>
-        <div>LAPTOP</div>
-            <p><b>S21 Laptop Ultra HD LED <br/> 
-            Screen Feature 2023...</b></p>
-            <p><b>$1,199.00</b></p>
-        </div>
-        </li>
-
-        <li>
-        <div className='image'>
-        <img src='./Images/img6.PNG' style={{height: "250px", width: "250px"}}/>
-        <div>LAPTOP</div>
-            <p><b>S21 Laptop Ultra HD LED <br/> 
-            Screen Feature 2023...</b></p>
-            <p><b>$1,199.00</b></p>
-        </div>
-        </li>
-
-        <li>
-        <div className='image'>
-        <img src='./Images/img6.PNG' style={{height: "250px", width: "250px"}}/>
-        <div>LAPTOP</div>
-            <p><b>S21 Laptop Ultra HD LED <br/> 
-            Screen Feature 2023...</b></p>
-            <p><b>$1,199.00</b></p>
-        </div>
-        </li>
-
-        <li>
-        <div className='image'>
-        <img src='./Images/img6.PNG' style={{height: "250px", width: "250px"}}/>
-        <div>LAPTOP</div>
-            <p><b>S21 Laptop Ultra HD LED <br/> 
-            Screen Feature 2023...</b></p>
-            <p><b>$1,199.00</b></p>
-        </div>
-        </li>
-
-        </ul>
-        
-     </div>  
-      
-        
-    </div>
-  )
-}
+            <div className='products'>
+                <div className='slider'>
+                    <ul>
+                        {products.map((product) => (
+                            <li key={product.id}>
+                                <div className='image'>
+                                    <img 
+                                        src={product.image_url}
+                                        alt={product.name} 
+                                        style={{ height: "250px", width: "200px" }} 
+                                    />
+                                    
+                                    <p><b>{product.name}</b></p>
+                                    <p>{product.description}</p>
+                                    <p>
+                                        <b style={{ color: "#333" }}>${product.price}</b>
+                                        {product.originalPrice && (
+                                            <span style={{ textDecoration: "line-through" }}>
+                                                ${product.originalPrice}
+                                            </span>
+                                        )}
+                                    </p>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+                
+                {/* Pagination control */}
+                <div>
+                    <button 
+                        disabled={page === 1} 
+                        className='backbtn' 
+                        onClick={() => setPage(page - 1)}
+                    >
+                        <MdNavigateBefore size={25} />
+                    </button>
+                    
+                    <button 
+                        disabled={page === totalPages} 
+                        className='nextbtn' 
+                        onClick={() => setPage(page + 1)}
+                    >
+                        <MdNavigateNext size={25} />
+                    </button>
+                </div>
+            </div>
+        </>
+    );
+};
