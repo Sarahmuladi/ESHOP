@@ -8,7 +8,6 @@ import { AuthContext } from '../context/authContext';
 import { useContext} from 'react'
 
 
-
 const Login = () => { 
 
     const navigate = useNavigate();
@@ -38,6 +37,7 @@ const Login = () => {
           navigate("/"); 
       } else {
           console.error("Login failed:", data.error);
+          setMessage(data.error);
       }
 
     }

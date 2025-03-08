@@ -3,7 +3,8 @@ import "./products.css";
 import { MdNavigateNext } from 'react-icons/md';
 import { MdNavigateBefore } from 'react-icons/md';
 import axios from 'axios';
-
+import dotenv from 'dotenv';
+//dotenv.config();
 
 export const Products = () => {
     const [products, setProducts] = useState([]);

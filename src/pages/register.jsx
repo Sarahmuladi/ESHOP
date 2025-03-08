@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import "./register.css";
 import { useNavigate } from 'react-router-dom';
+import dotenv from 'dotenv';
+
 
 const Register = () => {
 
