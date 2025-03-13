@@ -15,16 +15,7 @@ export const Products = () => {
     const {addProductToCart} = useContext(CartContext);
 
     const handleAddToCart = (product) => {
-        // const productData = {
-        //     id: product.id,
-        //     name: product.name,
-        //     description: product.description,
-        //     price: product.price,
-        //     image: product.image_url,
-        //     quantity: 1, 
-        // };
-        // console.log(productData)
-        // Ensure the product details are correct
+        
         console.log('Adding to cart:', product);
 
         addProductToCart(product);

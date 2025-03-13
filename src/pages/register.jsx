@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import "./register.css";
 import { useNavigate } from 'react-router-dom';
-import dotenv from 'dotenv';
+//import dotenv from 'dotenv';
+import config from './config';
 
 
 const Register = () => {
@@ -24,7 +25,7 @@ const Register = () => {
         }
 
         
-        const response = await fetch('http://localhost:5000/api/register', {
+        const response = await fetch(`${config.backendUrl}/api/register`, {
         method: "POST",
         headers: {
                    'Content-Type': 'application/json',

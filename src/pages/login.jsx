@@ -6,9 +6,11 @@ import { FcGoogle } from 'react-icons/fc';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/authContext';
 import { useContext} from 'react'
+import config from './config';
 
 
 const Login = () => { 
+
 
     const navigate = useNavigate();
 
@@ -21,20 +23,21 @@ const Login = () => {
 
     const handleSubmit = async(e) => {
     e.preventDefault();
-
-     const response = await fetch("http://localhost:5000/api/login", {
+const response = await fetch(`${config.backendUrl}/api/login`, {
           method: "POST",
           body: JSON.stringify({ email, password }),
           headers: { "Content-Type": "application/json" },
       });
+     
   
       const data = await response.json();
+
   
       if (response.ok) {
           localStorage.setItem("accessToken", data.accessToken);
           localStorage.setItem("refreshToken", data.refreshToken);
           setUser(data.user); // Update context
-          navigate("/"); 
+          navigate("/");
       } else {
           console.error("Login failed:", data.error);
           setMessage(data.error);

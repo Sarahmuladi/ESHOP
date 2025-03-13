@@ -144,7 +144,7 @@ export const AuthProvider = ({ children }) => {
             accessToken, 
             loading,
             error,
-            setUser,  // Added setUser to the context
+            setUser,  
             register, 
             login, 
             logout 
