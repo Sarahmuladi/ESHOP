@@ -1,15 +1,34 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import "./products.css";
 import { MdNavigateNext } from 'react-icons/md';
 import { MdNavigateBefore } from 'react-icons/md';
 import axios from 'axios';
 import dotenv from 'dotenv';
 //dotenv.config();
+import { CartContext } from '../context/cartContext';
 
 export const Products = () => {
     const [products, setProducts] = useState([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
+
+    const {addProductToCart} = useContext(CartContext);
+
+    const handleAddToCart = (product) => {
+        // const productData = {
+        //     id: product.id,
+        //     name: product.name,
+        //     description: product.description,
+        //     price: product.price,
+        //     image: product.image_url,
+        //     quantity: 1, 
+        // };
+        // console.log(productData)
+        // Ensure the product details are correct
+        console.log('Adding to cart:', product);
+
+        addProductToCart(product);
+    };
 
     const fetchProducts = async (pageNumber) => {
         try {
@@ -55,6 +74,7 @@ export const Products = () => {
                                             </span>
                                         )}
                                     </p>
+                                    <button onClick={() => handleAddToCart(product)}>Add to Cart</button>
                                 </div>
                             </li>
                         ))}

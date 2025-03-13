@@ -3,8 +3,16 @@ import "./secondBar.css"
 import { IoIosSearch } from 'react-icons/io';
 import { HiOutlineShoppingCart } from 'react-icons/hi';
 import { RiUserLine } from 'react-icons/ri';
+import { useNavigate } from 'react-router-dom';
 
 export const SecondBar = () => {
+
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+     navigate('/cart')
+  }
+
   return (
     <div className='secondBar'>
         <div className='eShop'>e-shop</div>
@@ -15,7 +23,9 @@ export const SecondBar = () => {
         </div>
 
         <div className='cart'>
-        <HiOutlineShoppingCart size={35}/>
+        <button type="button" onClick={handleClick} style={{backgroundColor: "red", border: "none"}}>
+          <HiOutlineShoppingCart size={35}/>
+          </button>
         <div>Cart <br/> <b><div>$0</div></b></div>
         </div>|
 

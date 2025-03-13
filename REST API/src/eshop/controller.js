@@ -308,45 +308,47 @@ const deleteProductFromCart = (req, res) => {
 
 //VIEW ALL PRODUCTS IN THE CART
 const getCartItems = (req, res) =>{
-    pool.query(queries.getCartItems, (error, results) => {
+    const { user_id } = req.params;
+
+    pool.query(queries.getCartItems, [user_id], (error, results) => {
         if (error) throw error;
         res.status(200).json(results.rows)
     });
 };
 
 //CREATING AN ORDER OR CHECKOUT
-const createAnOrder = ((req, res) => {
-const { user_id, items} = req.body; //An array of items[{product_id, quantity, price}]
+const createAnOrder = async (req, res) => {
+    const { user_id, items } = req.body; // An array of items [{product_id, quantity, price}]
 
-if (!user_id || !items || items.length === 0) {
-    return res.status(400).send("Use ID and items are required")
-}
-
-//Calculate total price
-const total_price = 0;
-items.forEach(item => {
-    total_price += item.quantity * item.price;
-});
-
-//Insert into orders table
-pool.query(queries.createAnOrder, [user_id, total_price, 'pending'], (error, results) => {
-    if (error){
-        console.error("Error creating order:", error);
+    if (!user_id || !items || items.length === 0) {
+        return res.status(400).send("User ID and items are required");
     }
-    res.status(500).send("Server Error")
-});
 
-const order_id = results.rows[0].id;
-
-//Clear the cart after order completion
-    pool.query(queries.deleteFromCart, [user_id], (error, results) => {
-        if (error) {
-            console.error("Error deleting cart items:", error);
-        }
+    // Calculate total price
+    let total_price = 0;
+    items.forEach(item => {
+        total_price += item.quantity * item.price;
     });
 
-res.status(201).json({ message: "Order created successfully", order_id});
-});
+    try {
+        // Insert into orders table
+        const orderResult = await pool.query(queries.createAnOrder, [user_id, total_price, 'pending']);
+        const order_id = orderResult.rows[0].id;
+
+        // Insert order items
+        for (const item of items) {
+            await pool.query(queries.addOrderItem, [order_id, item.product_id, item.quantity, item.price]);
+        }
+
+        // Clear the cart after order completion
+        await pool.query(queries.deleteFromCart, [user_id]);
+
+        res.status(201).json({ message: "Order created successfully", order_id });
+    } catch (error) {
+        console.error("Error creating order:", error);
+        res.status(500).send("Server Error");
+    }
+};
 
 // READ ALL PRODUCTS FROM ORDERS TABLE
 const getOrders = (req, res) =>{
